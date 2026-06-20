@@ -115,12 +115,8 @@ input, select, textarea {
   border: 1px solid rgba(255,255,255,0.2);
 }
 
-select {
-  color: black;
-  background: white;
-}
-
-option {
+/* FIX DROPDOWN VISIBILITY */
+select, option {
   color: black;
   background: white;
 }
@@ -191,7 +187,7 @@ textarea {
   </div>
 </div>
 
-<!-- PRO APPLY (FIXED) -->
+<!-- PRO APPLY -->
 <div id="pro" class="page">
   <h2>PRO APPLY</h2>
   <div class="panel">
@@ -210,8 +206,7 @@ textarea {
       <option>Unreal</option>
     </select><br>
 
-    <textarea id="proReason" placeholder="Why do you want pro?"></textarea><br>
-
+    <textarea id="proReason" placeholder="Why pro?"></textarea><br>
     <button onclick="submitPro()">SUBMIT</button>
   </div>
 </div>
@@ -230,43 +225,17 @@ textarea {
     </select><br>
 
     <textarea id="coachReason" placeholder="Why coach?"></textarea><br>
-
     <button onclick="submitCoach()">SUBMIT</button>
   </div>
 </div>
 
-<!-- ABOUT (EXPANDED) -->
+<!-- ABOUT -->
 <div id="about" class="page">
   <h2>ABOUT APEX</h2>
   <div class="panel">
-
-    <p><b>APEX</b> is a competitive esports organization built for players who want to rise above average gameplay and become structured competitors.</p>
-
-    <p>We are not a casual community — we are a competitive system focused on discipline, consistency, and improvement.</p>
-
-    <p><b>WHAT WE DO:</b></p>
-    <p>
-      • Competitive player development<br>
-      • Ranked progression tracking<br>
-      • Pro-level tryouts and scouting<br>
-      • Coaching system for growth<br>
-      • Team-based competitive environment
-    </p>
-
-    <p><b>OUR GOAL:</b></p>
-    <p>
-      To turn motivated players into structured competitors who can perform under pressure and dominate in competitive environments.
-    </p>
-
-    <p><b>MINDSET:</b></p>
-    <p>
-      No excuses. No ego. Just improvement and results.
-    </p>
-
-    <p style="color:#aaa;">
-      “We don’t lose — we learn, adapt, and dominate.”
-    </p>
-
+    <p><b>APEX</b> is a competitive esports organization built for players who want to dominate.</p>
+    <p>We focus on skill, discipline, and competitive progression.</p>
+    <p><b>MINDSET:</b> We don’t lose — we adapt and dominate.</p>
   </div>
 </div>
 
@@ -276,76 +245,95 @@ textarea {
   <div class="stats" id="statsBox"></div>
 </div>
 
-<script>
-/* 💬 SAYINGS (RANDOM EVERY REFRESH) */
-const sayings = [
-  "We are not losers. We are dominators.",
-  "We don’t compete — we conquer.",
-  "We don’t lose. We adapt and dominate.",
-  "Only grinders survive Apex.",
-  "Dominate or be dominated."
-];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
-function pickRandom(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
+const firebaseConfig = {
+  apiKey: "AIzaSyCQE9kuVnS2ocgUBnCeh4PapGsJBoaWJPs",
+  authDomain: "apex-1afbc.firebaseapp.com",
+  projectId: "apex-1afbc",
+  storageBucket: "apex-1afbc.firebasestorage.app",
+  messagingSenderId: "175993919550",
+  appId: "1:175993919550:web:093a686a9e9a4f8238596f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const appsRef = collection(db, "applications");
+const proRef = collection(db, "proApplications");
+const coachRef = collection(db, "coachApplications");
+const membersRef = collection(db, "members");
+
+window.statsData = {apps:0,pro:0,coach:0,members:32};
+
+function render(){
+  document.getElementById("statsBox").innerHTML = `
+  <div class="statBox">Applications<br>${statsData.apps}</div>
+  <div class="statBox">Pro Apps<br>${statsData.pro}</div>
+  <div class="statBox">Members<br>${statsData.members}</div>
+  <div class="statBox">Coaches<br>1</div>
+  <div class="statBox">Coach Apps<br>${statsData.coach}</div>
+  `;
 }
 
-/* INTRO + HOME RANDOM */
-document.getElementById("introText").innerText = pickRandom(sayings);
-document.getElementById("homeText").innerText = pickRandom(sayings);
+onSnapshot(query(appsRef),(s)=>{statsData.apps=s.size;render();});
+onSnapshot(query(proRef),(s)=>{statsData.pro=s.size;render();});
+onSnapshot(query(coachRef),(s)=>{statsData.coach=s.size;render();});
+onSnapshot(query(membersRef),(s)=>{statsData.members=s.size;render();});
 
-/* INTRO REMOVE */
-setTimeout(()=>{
-  document.getElementById("intro").classList.add("hide");
-},3000);
+/* FIXED BUTTONS */
+window.submitApp = async ()=>{
+  await addDoc(appsRef,{
+    name:document.getElementById("name").value,
+    discord:document.getElementById("discord").value,
+    reason:document.getElementById("reason").value
+  });
+};
+
+window.submitPro = async ()=>{
+  await addDoc(proRef,{
+    name:document.getElementById("proName").value,
+    discord:document.getElementById("proDiscord").value,
+    rank:document.getElementById("rank").value,
+    reason:document.getElementById("proReason").value
+  });
+};
+
+window.submitCoach = async ()=>{
+  await addDoc(coachRef,{
+    name:document.getElementById("coachName").value,
+    discord:document.getElementById("coachDiscord").value,
+    coached:document.getElementById("hasCoached").value,
+    reason:document.getElementById("coachReason").value
+  });
+};
 
 /* NAV */
-function show(p){
-  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+window.show=(p)=>{
+  document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
   document.getElementById(p).classList.add("active");
-}
+};
 
-/* WEBHOOK */
-const webhook = "https://discord.com/api/webhooks/1517667847097024603/7_SV-5n2-Eucms2LzE-SH_HXNSj0YsTRIZ7cluc119KfLhO5e2MxeB9FBuXb1EiqLKb0";
+/* SAYINGS */
+const sayings=[
+  "We don’t lose — we dominate.",
+  "Only grinders survive APEX.",
+  "We are built different."
+];
 
-function notify(type,name,msg){
-  if(!webhook.includes("http")) return;
-  fetch(webhook,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      content:`🔥 ${type}\n👤 ${name}\n📝 ${msg}`
-    })
-  });
-}
+document.getElementById("introText").innerText =
+sayings[Math.floor(Math.random()*sayings.length)];
 
-/* SUBMIT */
-function submitApp(){
-  notify("APP",name.value,reason.value);
-}
-
-function submitPro(){
-  notify("PRO",proName.value,proReason.value + " | Rank: " + rank.value + " | Discord: " + proDiscord.value);
-}
-
-function submitCoach(){
-  notify("COACH",coachName.value,coachReason.value);
-}
-
-/* STATS */
-let apps = 32;
-let pro = 2;
-let coach = 1;
-let members = 32;
-let coachApps = 0;
-
-document.getElementById("statsBox").innerHTML = `
-<div class="statBox">Applications<br>${apps}</div>
-<div class="statBox">Pro Apps<br>${pro}</div>
-<div class="statBox">Members<br>${members}</div>
-<div class="statBox">Coaches<br>${coach}</div>
-<div class="statBox">Coach Applications<br>${coachApps}</div>
-`;
+document.getElementById("homeText").innerText =
+sayings[Math.floor(Math.random()*sayings.length)];
 </script>
 
 </body>
