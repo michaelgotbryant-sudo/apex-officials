@@ -279,11 +279,107 @@ document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 };
 
-/* WEBHOOK READY (UNCHANGED SLOT IF YOU HAD IT) */
-window.submitApp = window.submitApp || function(){};
-window.submitPro = window.submitPro || function(){};
-window.submitCoach = window.submitCoach || function(){};
+/* ===========================
+        DISCORD WEBHOOK
+   PASTE YOUR WEBHOOK BELOW
+=========================== */
 
+const WEBHOOK_URL = "";
+// Example:
+// const WEBHOOK_URL = "https://discord.com/api/webhooks/xxxxxxxxxxxxxxxx";
+
+/* ===========================
+      APPLICATION WEBHOOKS
+=========================== */
+
+window.submitApp = async function(){
+
+  if(!WEBHOOK_URL) return alert("Webhook not set.");
+
+  const message = `
+📩 MEMBER APPLICATION
+
+Epic Username: ${document.getElementById("name").value}
+Discord: ${document.getElementById("discord").value}
+
+Reason:
+${document.getElementById("reason").value}
+`;
+
+  await fetch(WEBHOOK_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      content:message
+    })
+  });
+
+  alert("Application Submitted!");
+};
+
+
+window.submitPro = async function(){
+
+  if(!WEBHOOK_URL) return alert("Webhook not set.");
+
+  const message = `
+🔥 PRO APPLICATION
+
+Epic Username: ${document.getElementById("proName").value}
+Discord: ${document.getElementById("proDiscord").value}
+
+Rank:
+${document.getElementById("rank").value}
+
+Reason:
+${document.getElementById("proReason").value}
+`;
+
+  await fetch(WEBHOOK_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      content:message
+    })
+  });
+
+  alert("Pro Application Submitted!");
+};
+
+
+window.submitCoach = async function(){
+
+  if(!WEBHOOK_URL) return alert("Webhook not set.");
+
+  const message = `
+🎓 COACH APPLICATION
+
+Epic Username: ${document.getElementById("coachName").value}
+Discord: ${document.getElementById("coachDiscord").value}
+
+Coached Before:
+${document.getElementById("hasCoached").value}
+
+Reason:
+${document.getElementById("coachReason").value}
+`;
+
+  await fetch(WEBHOOK_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      content:message
+    })
+  });
+
+  alert("Coach Application Submitted!");
+};
 </script>
 
 </body>
