@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>APEX ESPORTS LAUNCHER</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: black;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND */
+video {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  filter: brightness(0.35) contrast(1.2);
+  z-index: -2;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.85));
+  z-index: -1;
+}
+
+/* INTRO */
+.intro {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+.intro.hide {
+  opacity: 0;
+  visibility: hidden;
+  transition: 1s ease;
+}
+
+.intro h1 {
+  font-size: 90px;
+  letter-spacing: 18px;
+}
+
+.intro p {
+  color: #888;
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+/* NAV */
+.nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  padding: 18px;
+  background: rgba(0,0,0,0.55);
+}
+
+.nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* PAGES */
+.page {
+  display: none;
+  min-height: 100vh;
+  padding: 120px 20px 60px;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page.active {
+  display: flex;
+}
+
+/* PANEL */
+.panel {
+  margin-top: 20px;
+  max-width: 750px;
+  padding: 20px 30px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  text-align: left;
+  line-height: 1.6;
+}
+
+/* INPUTS */
+input, select, textarea {
+  padding: 10px;
+  width: 260px;
+  margin: 6px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+select {
+  color: black;
+  background: white;
+}
+
+option {
+  color: black;
+  background: white;
+}
+
+textarea {
+  height: 80px;
+  resize: none;
+}
+
+/* STATS */
+.stats {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.statBox {
+  padding: 15px 25px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  min-width: 170px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<video autoplay muted loop>
+<source src="https://cdn.coverr.co/videos/coverr-digital-grid-and-particles-1637/1080p.mp4">
+</video>
+
+<div class="overlay"></div>
+
+<!-- INTRO -->
+<div class="intro" id="intro">
+  <h1>APEX</h1>
+  <p id="introText"></p>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="show('home')">HOME</button>
+  <button onclick="show('apply')">APPLY</button>
+  <button onclick="show('pro')">PRO APPLY</button>
+  <button onclick="show('coach')">COACH APPLY</button>
+  <button onclick="show('about')">ABOUT</button>
+  <button onclick="show('stats')">STATS</button>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <h2>WELCOME TO APEX</h2>
+  <p id="homeText" style="color:#aaa;"></p>
+</div>
+
+<!-- APPLY -->
+<div id="apply" class="page">
+  <h2>APPLICATION</h2>
+  <div class="panel">
+    <input id="name" placeholder="Name"><br>
+    <input id="discord" placeholder="Discord"><br>
+    <textarea id="reason" placeholder="Why join?"></textarea><br>
+    <button onclick="submitApp()">SUBMIT</button>
+  </div>
+</div>
+
+<!-- PRO APPLY (FIXED) -->
+<div id="pro" class="page">
+  <h2>PRO APPLY</h2>
+  <div class="panel">
+    <input id="proName" placeholder="Name"><br>
+    <input id="proDiscord" placeholder="Discord Username"><br>
+
+    <select id="rank">
+      <option>What’s your rank?</option>
+      <option>Bronze</option>
+      <option>Silver</option>
+      <option>Gold</option>
+      <option>Platinum</option>
+      <option>Diamond</option>
+      <option>Elite</option>
+      <option>Champion</option>
+      <option>Unreal</option>
+    </select><br>
+
+    <textarea id="proReason" placeholder="Why do you want pro?"></textarea><br>
+
+    <button onclick="submitPro()">SUBMIT</button>
+  </div>
+</div>
+
+<!-- COACH APPLY -->
+<div id="coach" class="page">
+  <h2>COACH APPLY</h2>
+  <div class="panel">
+    <input id="coachName" placeholder="Name"><br>
+    <input id="coachDiscord" placeholder="Discord"><br>
+
+    <select id="hasCoached">
+      <option value="">Have you coached before?</option>
+      <option>Yes</option>
+      <option>No</option>
+    </select><br>
+
+    <textarea id="coachReason" placeholder="Why coach?"></textarea><br>
+
+    <button onclick="submitCoach()">SUBMIT</button>
+  </div>
+</div>
+
+<!-- ABOUT (EXPANDED) -->
+<div id="about" class="page">
+  <h2>ABOUT APEX</h2>
+  <div class="panel">
+
+    <p><b>APEX</b> is a competitive esports organization built for players who want to rise above average gameplay and become structured competitors.</p>
+
+    <p>We are not a casual community — we are a competitive system focused on discipline, consistency, and improvement.</p>
+
+    <p><b>WHAT WE DO:</b></p>
+    <p>
+      • Competitive player development<br>
+      • Ranked progression tracking<br>
+      • Pro-level tryouts and scouting<br>
+      • Coaching system for growth<br>
+      • Team-based competitive environment
+    </p>
+
+    <p><b>OUR GOAL:</b></p>
+    <p>
+      To turn motivated players into structured competitors who can perform under pressure and dominate in competitive environments.
+    </p>
+
+    <p><b>MINDSET:</b></p>
+    <p>
+      No excuses. No ego. Just improvement and results.
+    </p>
+
+    <p style="color:#aaa;">
+      “We don’t lose — we learn, adapt, and dominate.”
+    </p>
+
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="stats" class="page">
+  <h2>STATS</h2>
+  <div class="stats" id="statsBox"></div>
+</div>
+
+<script>
+/* 💬 SAYINGS (RANDOM EVERY REFRESH) */
+const sayings = [
+  "We are not losers. We are dominators.",
+  "We don’t compete — we conquer.",
+  "We don’t lose. We adapt and dominate.",
+  "Only grinders survive Apex.",
+  "Dominate or be dominated."
+];
+
+function pickRandom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* INTRO + HOME RANDOM */
+document.getElementById("introText").innerText = pickRandom(sayings);
+document.getElementById("homeText").innerText = pickRandom(sayings);
+
+/* INTRO REMOVE */
+setTimeout(()=>{
+  document.getElementById("intro").classList.add("hide");
+},3000);
+
+/* NAV */
+function show(p){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById(p).classList.add("active");
+}
+
+/* WEBHOOK */
+const webhook = "PUT_YOUR_WEBHOOK_HERE";
+
+function notify(type,name,msg){
+  if(!webhook.includes("http")) return;
+  fetch(webhook,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      content:`🔥 ${type}\n👤 ${name}\n📝 ${msg}`
+    })
+  });
+}
+
+/* SUBMIT */
+function submitApp(){
+  notify("APP",name.value,reason.value);
+}
+
+function submitPro(){
+  notify("PRO",proName.value,proReason.value + " | Rank: " + rank.value + " | Discord: " + proDiscord.value);
+}
+
+function submitCoach(){
+  notify("COACH",coachName.value,coachReason.value);
+}
+
+/* STATS */
+let apps = 32;
+let pro = 2;
+let coach = 1;
+let members = 32;
+let coachApps = 0;
+
+document.getElementById("statsBox").innerHTML = `
+<div class="statBox">Applications<br>${apps}</div>
+<div class="statBox">Pro Apps<br>${pro}</div>
+<div class="statBox">Members<br>${members}</div>
+<div class="statBox">Coaches<br>${coach}</div>
+<div class="statBox">Coach Applications<br>${coachApps}</div>
+`;
+</script>
+
+</body>
+</html>
