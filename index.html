@@ -13,7 +13,6 @@ body {
   overflow-x: hidden;
 }
 
-/* BACKGROUND */
 video {
   position: fixed;
   width: 100vw;
@@ -40,12 +39,7 @@ video {
   align-items: center;
   flex-direction: column;
   z-index: 9999;
-}
-
-.intro.hide {
-  opacity: 0;
-  visibility: hidden;
-  transition: 1s ease;
+  transition: opacity 0.6s ease;
 }
 
 .intro h1 {
@@ -69,6 +63,7 @@ video {
   gap: 25px;
   padding: 18px;
   background: rgba(0,0,0,0.55);
+  z-index: 10;
 }
 
 .nav button {
@@ -102,28 +97,6 @@ video {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   text-align: left;
-  line-height: 1.6;
-}
-
-/* INPUTS */
-input, select, textarea {
-  padding: 10px;
-  width: 260px;
-  margin: 6px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-/* FIX DROPDOWN VISIBILITY */
-select, option {
-  color: black;
-  background: white;
-}
-
-textarea {
-  height: 80px;
-  resize: none;
 }
 
 /* STATS */
@@ -147,7 +120,6 @@ textarea {
 
 <body>
 
-<!-- BACKGROUND -->
 <video autoplay muted loop>
 <source src="https://cdn.coverr.co/videos/coverr-digital-grid-and-particles-1637/1080p.mp4">
 </video>
@@ -160,7 +132,6 @@ textarea {
   <p id="introText"></p>
 </div>
 
-<!-- NAV -->
 <div class="nav">
   <button onclick="show('home')">HOME</button>
   <button onclick="show('apply')">APPLY</button>
@@ -170,32 +141,27 @@ textarea {
   <button onclick="show('stats')">STATS</button>
 </div>
 
-<!-- HOME -->
 <div id="home" class="page active">
   <h2>WELCOME TO APEX</h2>
   <p id="homeText" style="color:#aaa;"></p>
 </div>
 
-<!-- APPLY -->
 <div id="apply" class="page">
   <h2>APPLICATION</h2>
   <div class="panel">
-    <input id="name" placeholder="Name"><br>
+    <input id="name" placeholder="Epic Username"><br>
     <input id="discord" placeholder="Discord"><br>
     <textarea id="reason" placeholder="Why join?"></textarea><br>
     <button onclick="submitApp()">SUBMIT</button>
   </div>
 </div>
 
-<!-- PRO APPLY -->
 <div id="pro" class="page">
   <h2>PRO APPLY</h2>
   <div class="panel">
-    <input id="proName" placeholder="Name"><br>
+    <input id="proName" placeholder="Epic Username"><br>
     <input id="proDiscord" placeholder="Discord Username"><br>
-
     <select id="rank">
-      <option>What’s your rank?</option>
       <option>Bronze</option>
       <option>Silver</option>
       <option>Gold</option>
@@ -205,41 +171,35 @@ textarea {
       <option>Champion</option>
       <option>Unreal</option>
     </select><br>
-
-    <textarea id="proReason" placeholder="Why pro?"></textarea><br>
+    <textarea id="proReason" placeholder="Why join pro team?"></textarea><br>
     <button onclick="submitPro()">SUBMIT</button>
   </div>
 </div>
 
-<!-- COACH APPLY -->
 <div id="coach" class="page">
   <h2>COACH APPLY</h2>
   <div class="panel">
-    <input id="coachName" placeholder="Name"><br>
+    <input id="coachName" placeholder="Epic Username"><br>
     <input id="coachDiscord" placeholder="Discord"><br>
-
     <select id="hasCoached">
-      <option value="">Have you coached before?</option>
+      <option>Have you coached before?</option>
       <option>Yes</option>
       <option>No</option>
     </select><br>
-
-    <textarea id="coachReason" placeholder="Why coach?"></textarea><br>
+    <textarea id="coachReason" placeholder="Why become a coach?"></textarea><br>
     <button onclick="submitCoach()">SUBMIT</button>
   </div>
 </div>
 
-<!-- ABOUT -->
 <div id="about" class="page">
-  <h2>ABOUT APEX</h2>
+  <h2>ABOUT US</h2>
   <div class="panel">
-    <p><b>APEX</b> is a competitive esports organization built for players who want to dominate.</p>
-    <p>We focus on skill, discipline, and competitive progression.</p>
-    <p><b>MINDSET:</b> We don’t lose — we adapt and dominate.</p>
+    <p><b>APEX</b> is a competitive esports organization built for domination and growth.</p>
+    <p>We are more than a team — we are a system built to develop skilled players into elite competitors.</p>
+    <p>We don’t lose — we adapt, improve, and dominate.</p>
   </div>
 </div>
 
-<!-- STATS -->
 <div id="stats" class="page">
   <h2>STATS</h2>
   <div class="stats" id="statsBox"></div>
@@ -247,93 +207,80 @@ textarea {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  query
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQE9kuVnS2ocgUBnCeh4PapGsJBoaWJPs",
+  apiKey: "AIzaSyCQE9kuVnS2ocgUBNceh...JBoaWJPs",
   authDomain: "apex-1afbc.firebaseapp.com",
-  projectId: "apex-1afbc",
-  storageBucket: "apex-1afbc.firebasestorage.app",
-  messagingSenderId: "175993919550",
-  appId: "1:175993919550:web:093a686a9e9a4f8238596f"
+  projectId: "apex-1afbc"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+initializeApp(firebaseConfig);
 
-const appsRef = collection(db, "applications");
-const proRef = collection(db, "proApplications");
-const coachRef = collection(db, "coachApplications");
-const membersRef = collection(db, "members");
-
-window.statsData = {apps:0,pro:0,coach:0,members:32};
+/* STATS */
+window.statsData = {
+  apps: 32,
+  pro: 2,
+  coachApps: 0,
+  members: 32
+};
 
 function render(){
-  document.getElementById("statsBox").innerHTML = `
-  <div class="statBox">Applications<br>${statsData.apps}</div>
-  <div class="statBox">Pro Apps<br>${statsData.pro}</div>
-  <div class="statBox">Members<br>${statsData.members}</div>
-  <div class="statBox">Coaches<br>1</div>
-  <div class="statBox">Coach Apps<br>${statsData.coach}</div>
-  `;
+document.getElementById("statsBox").innerHTML=`
+<div class="statBox">Members<br>${statsData.members}</div>
+<div class="statBox">Members Applied<br>${statsData.apps}</div>
+<div class="statBox">Pros Applied<br>${statsData.pro}</div>
+<div class="statBox">Coaches<br>1</div>
+<div class="statBox">Coach Applications<br>${statsData.coachApps}</div>
+`;
 }
 
-onSnapshot(query(appsRef),(s)=>{statsData.apps=s.size;render();});
-onSnapshot(query(proRef),(s)=>{statsData.pro=s.size;render();});
-onSnapshot(query(coachRef),(s)=>{statsData.coach=s.size;render();});
-onSnapshot(query(membersRef),(s)=>{statsData.members=s.size;render();});
+render();
 
-/* FIXED BUTTONS */
-window.submitApp = async ()=>{
-  await addDoc(appsRef,{
-    name:document.getElementById("name").value,
-    discord:document.getElementById("discord").value,
-    reason:document.getElementById("reason").value
-  });
-};
-
-window.submitPro = async ()=>{
-  await addDoc(proRef,{
-    name:document.getElementById("proName").value,
-    discord:document.getElementById("proDiscord").value,
-    rank:document.getElementById("rank").value,
-    reason:document.getElementById("proReason").value
-  });
-};
-
-window.submitCoach = async ()=>{
-  await addDoc(coachRef,{
-    name:document.getElementById("coachName").value,
-    discord:document.getElementById("coachDiscord").value,
-    coached:document.getElementById("hasCoached").value,
-    reason:document.getElementById("coachReason").value
-  });
-};
-
-/* NAV */
-window.show=(p)=>{
-  document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
-  document.getElementById(p).classList.add("active");
-};
-
-/* SAYINGS */
-const sayings=[
+/* ✔ UPDATED SAYINGS (YOUR NEW FULL SET) */
+const sayings = [
   "We don’t lose — we dominate.",
+  "Pressure builds legends, not excuses.",
+  "If you hesitate, you already lost.",
+  "Earn your place or watch others take it.",
+  "No limits. No excuses. Just grind.",
+  "Champions don’t wait for chances — they take them.",
+  "Stay calm. Play sharp. Win everything.",
+  "Skill is built, not gifted.",
+  "You either adapt or get replaced.",
+  "Every match is a statement.",
+  "We rise through discipline, not luck.",
   "Only grinders survive APEX.",
-  "We are built different."
+  "Built different.",
+  "Victory is the only option."
 ];
 
-document.getElementById("introText").innerText =
-sayings[Math.floor(Math.random()*sayings.length)];
+function pick(){
+  return sayings[Math.floor(Math.random() * sayings.length)];
+}
 
-document.getElementById("homeText").innerText =
-sayings[Math.floor(Math.random()*sayings.length)];
+document.getElementById("introText").innerText = pick();
+document.getElementById("homeText").innerText = pick();
+
+/* INTRO */
+function closeIntro(){
+  const intro = document.getElementById("intro");
+  if(!intro) return;
+
+  intro.style.opacity = "0";
+  setTimeout(()=>intro.remove(),600);
+}
+
+window.addEventListener("load",()=>{
+  setTimeout(closeIntro,1500);
+});
+
+setTimeout(closeIntro,3500);
+
+/* NAV */
+window.show = (p)=>{
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById(p).classList.add("active");
+};
 </script>
 
 </body>
