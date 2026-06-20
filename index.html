@@ -209,12 +209,31 @@ video {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQE9kuVnS2ocgUBNceh...JBoaWJPs",
+  apiKey: "AIzaSyCQE9kuVnS2ocgUBnCeh4PapGsJBoaWJPs",
   authDomain: "apex-1afbc.firebaseapp.com",
   projectId: "apex-1afbc"
 };
 
 initializeApp(firebaseConfig);
+
+/* =========================
+   📌 WEBHOOK AREA (PUT LINK HERE)
+   ========================= */
+const WEBHOOK_URL = ""; // 👈 PUT YOUR DISCORD WEBHOOK HERE
+
+async function sendWebhook(message) {
+  if (!WEBHOOK_URL) return;
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: message })
+    });
+  } catch (err) {
+    console.log("Webhook error:", err);
+  }
+}
 
 /* STATS */
 window.statsData = {
@@ -236,36 +255,25 @@ document.getElementById("statsBox").innerHTML=`
 
 render();
 
-/* ✔ UPDATED SAYINGS (YOUR NEW FULL SET) */
+/* SAYINGS */
 const sayings = [
   "We don’t lose — we dominate.",
   "Pressure builds legends, not excuses.",
-  "If you hesitate, you already lost.",
-  "Earn your place or watch others take it.",
-  "No limits. No excuses. Just grind.",
-  "Champions don’t wait for chances — they take them.",
-  "Stay calm. Play sharp. Win everything.",
-  "Skill is built, not gifted.",
-  "You either adapt or get replaced.",
-  "Every match is a statement.",
-  "We rise through discipline, not luck.",
-  "Only grinders survive APEX.",
   "Built different.",
   "Victory is the only option."
 ];
 
 function pick(){
-  return sayings[Math.floor(Math.random() * sayings.length)];
+  return sayings[Math.floor(Math.random()*sayings.length)];
 }
 
 document.getElementById("introText").innerText = pick();
 document.getElementById("homeText").innerText = pick();
 
-/* INTRO */
+/* INTRO FIX */
 function closeIntro(){
   const intro = document.getElementById("intro");
   if(!intro) return;
-
   intro.style.opacity = "0";
   setTimeout(()=>intro.remove(),600);
 }
@@ -281,6 +289,33 @@ window.show = (p)=>{
 document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
 document.getElementById(p).classList.add("active");
 };
+
+/* =========================
+   FORM HOOKS → WEBHOOK
+   ========================= */
+window.submitApp = () => {
+  sendWebhook(`📩 APPLICATION
+Username: ${document.getElementById("name").value}
+Discord: ${document.getElementById("discord").value}
+Reason: ${document.getElementById("reason").value}`);
+};
+
+window.submitPro = () => {
+  sendWebhook(`🔥 PRO APPLY
+Username: ${document.getElementById("proName").value}
+Discord: ${document.getElementById("proDiscord").value}
+Rank: ${document.getElementById("rank").value}
+Reason: ${document.getElementById("proReason").value}`);
+};
+
+window.submitCoach = () => {
+  sendWebhook(`🎓 COACH APPLY
+Username: ${document.getElementById("coachName").value}
+Discord: ${document.getElementById("coachDiscord").value}
+Coached Before: ${document.getElementById("hasCoached").value}
+Reason: ${document.getElementById("coachReason").value}`);
+};
+
 </script>
 
 </body>
